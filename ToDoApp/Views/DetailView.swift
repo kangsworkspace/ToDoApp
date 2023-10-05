@@ -15,8 +15,6 @@ class DetailView: UIView {
         button.setTitle("RED", for: .normal)
         button.setTitleColor(.black, for: .normal)
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 15)
-        button.clipsToBounds = true
-        button.layer.cornerRadius = button.bounds.height / 2
         button.tag = 1
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -27,8 +25,6 @@ class DetailView: UIView {
         button.setTitle("GREEN", for: .normal)
         button.setTitleColor(.black, for: .normal)
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 15)
-        button.clipsToBounds = true
-        button.layer.cornerRadius = button.bounds.height / 2
         button.tag = 2
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -39,8 +35,6 @@ class DetailView: UIView {
         button.setTitle("BLUE", for: .normal)
         button.setTitleColor(.black, for: .normal)
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 15)
-        button.clipsToBounds = true
-        button.layer.cornerRadius = button.bounds.height / 2
         button.tag = 3
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -51,11 +45,14 @@ class DetailView: UIView {
         button.setTitle("PURPLE", for: .normal)
         button.setTitleColor(.black, for: .normal)
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 15)
-        button.clipsToBounds = true
-        button.layer.cornerRadius = button.bounds.height / 2
         button.tag = 4
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
+    }()
+    
+    // button 사용
+    lazy var buttons: [UIButton] = {
+        return [redButton, greenButton, blueButton, purpleButton]
     }()
     
     var buttonStackView: UIStackView = {
@@ -78,6 +75,7 @@ class DetailView: UIView {
     
     var mainTextView: UITextView = {
         let tv = UITextView()
+        tv.text = "텍스트를 여기에 입력하세요."
         tv.autocorrectionType = .no
         tv.autocapitalizationType = .none
         tv.translatesAutoresizingMaskIntoConstraints = false
@@ -101,6 +99,15 @@ class DetailView: UIView {
         super.init(frame: frame)
         
         setupMain()
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        buttons.forEach { button in
+            button.clipsToBounds = true
+            button.layer.cornerRadius = button.bounds.height / 2
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -178,7 +185,7 @@ class DetailView: UIView {
 
 extension DetailView: UITextViewDelegate {
     // 입력을 시작할때
-    // (텍스트뷰는 플레이스홀더가 따로 있지 않아서, 플레이스 홀더처럼 동작하도록 직접 구현)
+    // (텍스트뷰 플레이스 홀더처럼 동작)
     func textViewDidBeginEditing(_ textView: UITextView) {
         if textView.text == "텍스트를 여기에 입력하세요." {
             textView.text = nil

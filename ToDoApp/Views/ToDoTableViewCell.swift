@@ -12,7 +12,7 @@ class ToDoTableViewCell: UITableViewCell {
     // toDoData 사용
     var toDoData: ToDoData? {
         didSet {
-            // 
+            configureUIwithData()
         }
     }
     
@@ -50,8 +50,8 @@ class ToDoTableViewCell: UITableViewCell {
         button.setImage(UIImage(systemName: "pencil"), for: .normal)
         button.clipsToBounds = true
         button.layer.cornerRadius = 10
-        button.addTarget(self, action: #selector(updateButtonTapped), for: .touchUpInside)
         button.titleLabel?.adjustsFontSizeToFitWidth = true
+        button.addTarget(self, action: #selector(updateButtonTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -161,10 +161,20 @@ class ToDoTableViewCell: UITableViewCell {
         ])
     }
     
-    // ToDoTableViewCell() - updateButton이 눌렸을 때
+    // updateButton이 눌렸을 때
     @objc func updateButtonTapped() {
         print("updateButton이 눌렸습니다.")
         updateButtonPressed(self)
+    }
+    
+    // 데이터를 통해 UI 표시하기
+    func configureUIwithData() {
+        toDoTextLabel.text = toDoData?.memoText
+        dateTextLabel.text = toDoData?.dateString
+        guard let colorNum = toDoData?.color else { return }
+        let color = MyColor(rawValue: colorNum) ?? .red
+        updateButton.backgroundColor = color.buttonColor
+        backView.backgroundColor = color.backgoundColor
     }
 
 }

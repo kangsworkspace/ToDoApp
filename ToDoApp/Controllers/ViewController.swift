@@ -73,27 +73,27 @@ class ViewController: UIViewController {
         
         // 테이블뷰의 선 없애기
         tableView.separatorStyle = .none
-
+        
         // 셀 등록
         tableView.register(ToDoTableViewCell.self, forCellReuseIdentifier: "ToDoCell")
     }
     
     // 셋업 - 테이블 뷰 오토 레이아웃
     func setupTableViewAutoLayout() {
-            
+        
         // 뷰에 테이블 뷰 추가
         view.addSubview(tableView)
-            
+        
         // 오토 레이아웃 설정
         tableView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-                tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
-                tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
-                tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0),
-                tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0)
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0)
         ])
     }
-    
+        
     // MARK: - 함수
     @objc func plusButtonTapped() {
         print("플러스 버튼이 눌렸습니다.")
@@ -121,6 +121,14 @@ extension ViewController: UITableViewDataSource {
         let toDoData = coreDataManager.getToDoListFromCoreData()
         // cell에 toDoData 입력
         cell.toDoData = toDoData[indexPath.row]
+        
+        // cell 내부 버튼 설정
+        cell.updateButtonPressed = { [weak self] (senderCell) in
+            let detailVC = DetailViewController()
+            detailVC.toDoData = toDoData[indexPath.row]
+            self?.navigationController?.pushViewController(detailVC, animated: true)
+        }
+        
         cell.selectionStyle = .none
         return cell
     }
@@ -131,15 +139,11 @@ extension ViewController: UITableViewDelegate {
     
     // 셀이 선택이 되었을때 어떤 동작을 할 것인지 뷰컨트롤러에게 물어봄
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        // 다음화면으로 이동
         print("\(indexPath.row)번째 Cell이 눌렸습니다.")
-        let detailVC = DetailViewController()
-        // detailVC.movieData = moviesArray[indexPath.row]
-        //show(detailVC, sender: nil)
-        
-        //    셀 높이 유동적으로 조절
-        //    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
-        //        return UITableView.automaticDimension
-        //    }
+    }
+    
+    // 셀 높이 유동적으로 조절
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        return UITableView.automaticDimension
     }
 }

@@ -12,6 +12,9 @@ class DetailViewController: UIViewController {
     // ToDoData 사용
     var toDoData: ToDoData?
     
+    // 데이터 매니저 사용
+    let coreDataManager = CoreDataManager.shared
+    
     // 디테일 뷰 사용
     let detailView = DetailView()
     
@@ -19,11 +22,6 @@ class DetailViewController: UIViewController {
     override func loadView() {
         view = detailView
     }
-    
-    // 선언 - color 버튼 사용
-    lazy var buttons: [UIButton] = {
-        return [detailView.redButton, detailView.greenButton, detailView.blueButton, detailView.purpleButton, detailView.saveButton]
-    }()
     
     // ToDo 색깔 구분을 위해 임시적으로 숫자저장하는 변수
     var temporaryNum: Int64? = 1
@@ -73,8 +71,6 @@ class DetailViewController: UIViewController {
         detailView.blueButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         detailView.purpleButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         detailView.saveButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
-
-        
     }
     
     // 텍스트뷰/저장(업데이트) 버튼 색상 설정
@@ -119,23 +115,60 @@ class DetailViewController: UIViewController {
     
     @objc func buttonTapped(sender: UIButton) {
         
-        switch sender.tag {
-        case 1:
-            print("\(sender.tag)"의 버튼이 눌렸습니다.")
-            return
-                  case 1:
-                      print("\(sender.tag)"의 버튼이 눌렸습니다.")
-                      return
-                            case 1:
-                                print("\(sender.tag)"의 버튼이 눌렸습니다.")
-                                return
-                                      case 1:
-                                          print("\(sender.tag)"의 버튼이 눌렸습니다.")
-                                          return
-                                                case 1:
-                                                    print("\(sender.tag)"의 버튼이 눌렸습니다.")
-                                                    return
+        // 버튼 tag의 숫자 사용
+        let buttonNum = sender.tag
+        
+        switch buttonNum {
+        // 색깔 버튼
+        case 1...4:
+            colorButtonTapped(num: buttonNum)
+        // SAVE 버튼
+        case 5:
+            saveButtonTapped(num: buttonNum)
+        default:
+            print("잘못된 tag = \(buttonNum)의 버튼이 눌렸습니다.")
+        }
+    }
+    
+    // 색 조정 버튼(tag == 1...4)이 눌렸을 때
+    func colorButtonTapped(num: Int) {
+        // 임시 숫자 저장
+        self.temporaryNum = Int64(num)
+        
+        // 버튼 tag -> 색 정보 받아오기
+        let color = MyColor(rawValue: Int64(num))
+        
+        // 텍스트뷰/저장(업데이트)버튼색 변경
+        setupColorTheme(color: color)
+        
+        // 버튼 색상 새롭게 세팅
+        clearButtonColors()
+        
+        // 눌려진 버튼 색상 설정
+        setupColorButton(num: Int64(num))
+    }
+    
+    // SAVE/UPDATE 버튼(tag == 5)이 눌렸을 때
+    func saveButtonTapped(num: Int) {
+        
+        // 기존 데이터가 있을 때 ==> 기존 데이터 없데이트
+        if let toDoData = self.toDoData {
+            toDoData.memoText = detailView.mainTextView.text
+            toDoData.color = temporaryNum ?? 1
+            
+            coreDataManager.updateToDo(newToDoDate: toDoData) {
+                print("업데이트 완료")
+            }
+            
+        } else {
+            // 기존 데이터가 없는 경우 ==> 새로운 데이터 생성
+            let memoText = detailView.mainTextView.text
+            coreDataManager.saveToDoData(todoText: memoText, colorInt: temporaryNum ?? 1) {
+                print("저장완료")
+            }
             
         }
+        // 버튼이 눌린 후 창 내리기
+        self.navigationController?.popViewController(animated: true)
     }
 }
